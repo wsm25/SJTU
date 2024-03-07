@@ -13,6 +13,10 @@ mod tests {
         assert_eqf(7.5, calculate(
             "5 7 2 3 * - * 10 4 / +".to_string()
         ).unwrap());
+        // testcase1 enhanced
+        assert_eqf(7.5, calculate(
+            "5 7 2 3*-*10 4/+".to_string()
+        ).unwrap());
         // testcase 2
         assert_eq!(Err(()), calculate(
             "1 2 + +".to_string()
@@ -26,7 +30,8 @@ mod calculator {
     pub fn calculate(s: String)->Result<f64, ()>{
         let mut st=Vec::new();
         let mut input = s.chars().into_iter();
-        while let Some(ch)=input.next() {
+        let mut chn=input.next();
+        while let Some(ch)=chn {
             match ch {
             '+' | '-' | '*' | '/' => {
                 if st.len()<2{
@@ -42,18 +47,21 @@ mod calculator {
                     _=>()
                 }
                 st.push(a);
+                chn=input.next();
             },
             '0'..='9' => {
                 let mut n = (ch as i32)-('0' as i32);
-                while let Some(ch)=input.next(){
+                chn=input.next();
+                while let Some(ch)=chn{
                     if ch<'0' || ch>'9' {
                         break;
                     }
                     n=n*10+(ch as i32)-('0' as i32);
+                    chn=input.next();
                 }
                 st.push(n as f64);
             },
-            _=>()
+            _ => chn=input.next(),
             }
         }
         if st.len()!=1{
