@@ -46,7 +46,7 @@ public:
     }
     int next(){
         iter_index();
-        std::cout<<"remove "<<index<<":"<<l[index]<<"\n";
+        // std::cout<<"remove "<<index<<":"<<l[index]<<"\n";
         return remove(index);
     }
     int last(){

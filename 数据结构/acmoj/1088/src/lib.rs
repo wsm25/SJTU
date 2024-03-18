@@ -15,11 +15,13 @@ mod tests{
     }
 }
 
+#[inline]
 fn positive_mod(n: isize, mo: isize) -> isize {
-    if n >= 0 {
-        n%mo
+    let r = n%mo;
+    if r >= 0 {
+        r
     } else {
-        n-(n/mo-1)*mo
+        mo+r
     }
 }
 
