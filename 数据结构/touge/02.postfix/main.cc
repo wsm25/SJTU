@@ -8,7 +8,7 @@ int main(){
     char ch;
     std::cin.get(ch);
     for(;;){
-        std::cout<<"get char "<<(ch)<<'\n';
+        std::cout<<"get char "<<(ch)<<'\n'; // debug info
         if(std::cin.fail()) { // end
             if(st.size()<1) {
                 std::cout<<"Error";
