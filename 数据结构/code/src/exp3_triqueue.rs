@@ -41,7 +41,7 @@ impl<T> Node<T>{
     }
 
     unsafe fn delete(p: *mut Self){
-        dealloc(p as *mut Self as *mut u8, Layout::new::<Self>());
+        dealloc(p as *mut u8, Layout::new::<Self>());
     }
 }
 

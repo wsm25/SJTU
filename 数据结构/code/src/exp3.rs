@@ -128,16 +128,11 @@ mod stack_queue{
     pub enum Type{Both, Stack, Queue, Error}
     use Type::*;
     pub fn type_of(l: &[Operation])->Type{
-        let (queue, stack) = (is_queue(l), is_stack(l));
-        match queue{
-            true=>match stack{
-                true=>Both,
-                false=>Queue,
-            },
-            false=>match stack{
-                true=>Stack,
-                false=>Error,
-            }
+        match (is_queue(l), is_stack(l)){
+            (true,  true) =>Both,
+            (true,  false)=>Queue,
+            (false, true) =>Stack,
+            (false, false)=>Error,
         }
     }
 }
