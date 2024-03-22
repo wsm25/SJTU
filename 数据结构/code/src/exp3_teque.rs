@@ -1,11 +1,12 @@
 use std::marker::PhantomData;
 use std::alloc::{alloc, dealloc, Layout};
 struct Node<T>{
-    left: *mut Self, // never null when inside dlist
+    left: *mut Self, // never null when inside dlist, no need to check null
     right: *mut Self,
     value: T,
 }
-pub struct TriQueue<T>{
+/// ## Triple-ended queue
+pub struct Teque<T>{
     head: *mut Node<T>,
     tail: *mut Node<T>,
     middle: *mut Node<T>,
@@ -45,7 +46,7 @@ impl<T> Node<T>{
     }
 }
 
-impl<T> TriQueue<T>{
+impl<T> Teque<T>{
     pub fn new()->Self{unsafe{
         let head = Node::new();
         let tail = Node::new();
@@ -56,7 +57,7 @@ impl<T> TriQueue<T>{
             (*head).left=0 as *mut Node<T>;
             (*tail).right=0 as *mut Node<T>;
         }
-        TriQueue{
+        Teque{
             head, tail, middle, len:0, _phantom:PhantomData
         }
     }}
@@ -169,7 +170,7 @@ impl<T> TriQueue<T>{
     }
 }
 
-impl<T> Drop for TriQueue<T>{
+impl<T> Drop for Teque<T>{
     fn drop(&mut self) {unsafe{
         let mut p=(*self.head).right;
         while p!=self.tail{

@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod test{
     #[test]
-    fn triqueue(){
-        use super::super::exp3_triqueue::*;
+    fn teque(){
+        use super::super::exp3_teque::*;
         // my test
-        let mut q = TriQueue::new();
+        let mut q = Teque::new();
         q.push_front(1);
         q.push_back(2);
         q.push_middle(3);
@@ -18,7 +18,7 @@ mod test{
         q.push_middle(1);
         assert_eq!(q.pop_back().unwrap(), 1);
         // test 1
-        let mut q = TriQueue::new();
+        let mut q = Teque::new();
         q.push_front(13);
         q.push_back(21);
         q.push_middle(5);
