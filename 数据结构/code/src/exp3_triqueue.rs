@@ -181,3 +181,36 @@ impl<T> Drop for TriQueue<T>{
         Node::delete(self.tail);
     }}
 }
+
+use std::collections::VecDeque;
+#[repr(transparent)]
+pub struct TriQueueBad<T>{
+    vec: VecDeque<T>
+}
+
+impl<T> TriQueueBad<T>{
+    pub fn new()->Self{
+        Self{vec:VecDeque::new()}
+    }
+    pub fn push_front(&mut self, x:T){
+        self.vec.push_front(x)
+    }
+    pub fn push_back(&mut self, x:T){
+        self.vec.push_back(x)
+    }
+    pub fn push_middle(&mut self, x:T){
+        self.vec.insert(self.vec.len()/2,x)
+    }
+    pub fn pop_front(&mut self)->Option<T>{
+        self.vec.pop_front()
+    }
+    pub fn pop_back(&mut self)->Option<T>{
+        self.vec.pop_back()
+    }
+    pub fn pop_middle(&mut self)->Option<T>{
+        self.vec.remove((self.vec.len()-1)/2)
+    }
+    pub fn into_vec(&self)->Vec<&T>{
+        self.vec.iter().collect()
+    }
+}
