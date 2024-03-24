@@ -3,6 +3,7 @@
 int main(){
     int len;
     std::cin>>len;
+    std::cin.get(); // flush \r
     std::cin.get(); // flush \n
     char *s=new char[len+1];
     char *st=new char[len], *p=st; // inline stack

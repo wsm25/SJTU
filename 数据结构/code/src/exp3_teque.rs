@@ -51,8 +51,8 @@ impl<T> Teque<T>{
         let head = Node::new();
         let tail = Node::new();
         Node::connect(head, tail);
-        let middle = head; // head when empty, compatative to push_back and push_middle
-        #[cfg(debug_assertions)] // debug for sigsegv
+        let middle = head; // head when empty, is not compatible with push_front
+        #[cfg(debug_assertions)] // debug with SIGSEGV
         {
             (*head).left=0 as *mut Node<T>;
             (*tail).right=0 as *mut Node<T>;
