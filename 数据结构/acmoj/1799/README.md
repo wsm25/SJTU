@@ -5,7 +5,7 @@
 暴力算法：直接遍历 i,j。
 显然 TLE。
 
-源码在 [`brute-force.cpp`](./brute-force.cpp)
+源码在 [`brute_force.cpp`](./brute_force.cpp)
 
 ## 单调栈
 本题的考点为 [单调栈](https://oi.wiki/ds/monotonous-stack/)。
