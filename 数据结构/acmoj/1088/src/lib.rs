@@ -16,7 +16,7 @@ mod tests{
 }
 
 #[inline]
-fn positive_mod(n: isize, mo: isize) -> isize {
+pub fn positive_mod(n: isize, mo: isize) -> isize {
     let r = n%mo;
     if r >= 0 {
         r
@@ -25,15 +25,15 @@ fn positive_mod(n: isize, mo: isize) -> isize {
     }
 }
 
-fn iter_index(mut index: isize, M: isize, N: isize, mut direction: isize)->(isize, isize){
+pub fn iter_index(mut index: isize, m: isize, n: isize, mut direction: isize)->(isize, isize){
     if direction!=0 {
-        index+=M-1;
+        index+=m-1;
     } else{
-        index-=M;
+        index-=m;
     }
-    index=positive_mod(index, (N-1)<<1);
-    if index>N-1 { // reverse
-        index=((N-1)<<1)-index;
+    index=positive_mod(index, (n-1)<<1);
+    if index>n-1 { // reverse
+        index=((n-1)<<1)-index;
         direction^=1;
     }
     return (index, direction);
