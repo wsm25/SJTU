@@ -42,9 +42,8 @@ int main(){
         printf(BAD_INPUT);
         return 0;
     }
-    if (x>y) {int t=x; x=y; y=t;}
     y>>=__builtin_clz(x)-__builtin_clz(y);
-    while(x!=y){ x>>=1; y>>=1;}
-    putchar(tree[x]);
+    int index=(x>>(64-__builtin_clz(x^y)));
+    putchar(tree[index]);
     return 0;
 }
