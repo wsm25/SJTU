@@ -2,14 +2,6 @@
 #define MAX 100000
 const char* BAD_INPUT="bad input";
 
-inline char read() { // 0 for null, -1 for error, others char
-    char ch = getchar();
-    if (ch=='n'){
-
-    }
-    return ch;
-}
-
 int main(){
     char tree[MAX]; // 0 for null
     tree[0]='X';

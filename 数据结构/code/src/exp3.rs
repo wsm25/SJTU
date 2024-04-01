@@ -67,7 +67,7 @@ mod test{
     }
 }
 
-// Problem 1: 吃不到的午餐
+/// Problem 1: 吃不到的午餐
 pub mod lunch{
     pub fn unsatisfy(students: &[u8], lunch: &[u8])->usize{
         let mut count=[0;10];

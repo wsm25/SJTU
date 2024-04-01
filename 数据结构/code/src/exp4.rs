@@ -58,8 +58,8 @@ pub fn parse_to_vec(s: &str)->Vec<Option<i32>>{
 pub fn parse_to_vecstr(s: &str)->Vec<Option<&str>>{
     s.split(" ").map(|s|{
         match s{
-            "null"=>None,
-            _=>Some(s)
+        "null" => None,
+        _ => Some(s)
         }
     }).collect()
 }
@@ -131,8 +131,8 @@ pub fn is_full(s: &str)->bool{
             None | Some(false) => Empty,
             Some(true)=>{ // non-null
                 match (self.is_full(), self.is_full()){
-                    (Empty, Empty) | (Full, Full)=>Full,
-                    _=>NotFull
+                (Empty, Empty) | (Full, Full)=>Full,
+                _=>NotFull
                 }
             }}
         }
@@ -145,13 +145,13 @@ pub fn is_full(s: &str)->bool{
 }
 
 /// Problem 4: Common ancestor
-pub fn common_ancestor<T>(i: &Vec<Option<T>>, x:u32, mut y:u32)->Option<&T>{
-    match (&i[(x-1) as usize], &i[(y-1) as usize]){
-        (Some(_), Some(_))=>{
-            y>>=x.leading_zeros()-y.leading_zeros();
-            let index=(x>>(32-(x^y).leading_zeros())) -1;
-            i[index as usize].as_ref()
-        },
-        _=>None
+pub fn common_ancestor<T>(i: &Vec<Option<T>>, x:usize, mut y:usize)->Option<&T>{
+    match (&i[x-1], &i[y-1]){
+    (Some(_), Some(_))=>{
+        y>>=x.leading_zeros()-y.leading_zeros();
+        let index=(x>>(usize::BITS-(x^y).leading_zeros())) -1;
+        i[index].as_ref()
+    },
+    _=>None
     }
 }
