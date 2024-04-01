@@ -1,3 +1,4 @@
+/// Experiment 3 - Problem 3: NewQueue
 use std::marker::PhantomData;
 use std::alloc::{alloc, dealloc, Layout};
 struct Node<T>{
@@ -5,7 +6,7 @@ struct Node<T>{
     right: *mut Self,
     value: T,
 }
-/// ## Triple-ended queue
+/// Triple-ended queue
 pub struct Teque<T>{
     head: *mut Node<T>,
     tail: *mut Node<T>,
@@ -184,6 +185,7 @@ impl<T> Drop for Teque<T>{
 }
 
 use std::collections::VecDeque;
+/// Bad Triple-ended queue
 #[repr(transparent)]
 pub struct TriQueueBad<T>{
     vec: VecDeque<T>

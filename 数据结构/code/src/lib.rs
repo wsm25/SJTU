@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+// #![allow(dead_code)]
 // to remove dead code warning, as this is not a real library
 
 pub mod exp1;

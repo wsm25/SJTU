@@ -9,14 +9,14 @@ mod tests{
         assert_eq!(l1.vector(), vec![2, 1, 3, 9]);
 
     }
-
-    fn assert_eqf(x: f64, y:f64){
-        if (x-y).abs()>1e-4 {
-            assert_eq!(x, y);
-        }
-    }
+    
     #[test]
     fn test_calculator() {
+        fn assert_eqf(x: f64, y:f64){
+            if (x-y).abs()>1e-4 {
+                assert_eq!(x, y);
+            }
+        }
         use super::calculator::calculate;
         // testcase 1
         assert_eqf(7.5, calculate(
@@ -34,18 +34,18 @@ mod tests{
 }
 
 
-// problem1 链表
-mod nodelist {
+/// Problem 1: 链表
+pub mod nodelist {
     type Link = Option<Box<Node>>;
     struct Node {
         value: i32,
         next: Link
     }
     
-    // TODO iterator and drop implement with
-    // ```rust
-    // type Link = Cell<Option<Box<Node>>>;
-    // ```
+    /// TODO iterator and drop implement with
+    /// ```rust, no_run
+    /// type Link = Cell<Option<Box<Node>>>;
+    /// ```
     pub struct NodeList{
         head: Box<Node>
     }
@@ -147,14 +147,11 @@ mod nodelist {
             return l;
         }
     }
-    
-
-    
 }
 
 
-// Problem 2: 四则计算器
-mod calculator {
+/// Problem 2: 四则计算器
+pub mod calculator {
     pub fn calculate(s: String)->Result<f64, ()>{
         let mut st=Vec::new();
         let mut input = s.chars().into_iter();

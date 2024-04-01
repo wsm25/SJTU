@@ -1,11 +1,6 @@
 // 实验1 类与对象
 
 mod tests {
-    fn assert_eqf(x: f64, y:f64){
-        if (x-y).abs()>1e-4 {
-            assert_eq!(x, y);
-        }
-    }
     #[test]
     fn test_line() {
         use super::line;
@@ -19,6 +14,11 @@ mod tests {
 
     #[test]
     fn test_point() {
+        fn assert_eqf(x: f64, y:f64){
+            if (x-y).abs()>1e-4 {
+                assert_eq!(x, y);
+            }
+        }
         use super::point::*;
         // triangle
         let t=triangle::new(0., 0., 0., 1., 1., 0.);
@@ -38,8 +38,8 @@ mod tests {
     }
 }
 
-// Problem 1: Line
-mod line {
+/// Problem 1: Line
+pub mod line {
     use super::sqr;
     pub struct Line {
         x1: f64,
@@ -59,8 +59,8 @@ mod line {
     }
 }
 
-// Problem2 point
-mod point{
+/// Problem 2: point
+pub mod point{
     use super::sqr;
     pub struct Point{x:f64, y:f64}
     fn dist(p1: &Point, p2: &Point)->f64{

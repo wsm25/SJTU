@@ -1,4 +1,4 @@
-// 实验4 树
+/// 实验4 树
 
 mod tests {
     #[test]
@@ -41,6 +41,8 @@ mod tests {
     }
 }
 
+/// Parses string like `"1 1 2 null 1 2 1"` to Vector like 
+/// `[1,1,2,None,1,2,1]`
 pub fn parse_to_vec(s: &str)->Vec<Option<i32>>{
     s.split(" ").map(|s|{
         match s{
@@ -50,6 +52,9 @@ pub fn parse_to_vec(s: &str)->Vec<Option<i32>>{
     }).collect()
 }
 
+
+/// Parses string like `"a b null c"` to Vector like 
+/// `["a", "b", None, "c"]`
 pub fn parse_to_vecstr(s: &str)->Vec<Option<&str>>{
     s.split(" ").map(|s|{
         match s{
@@ -59,7 +64,7 @@ pub fn parse_to_vecstr(s: &str)->Vec<Option<&str>>{
     }).collect()
 }
 
-// Problem 1: Count leaves
+/// Problem 1: Count leaves
 pub fn count_leaves(input: &[Option<i32>])->i32{
     let mut v=Vec::new();
     for i in input{
@@ -75,7 +80,7 @@ pub fn count_leaves(input: &[Option<i32>])->i32{
     v.iter().sum()
 }
 
-// Problem 2: Strip Tree
+/// Problem 2: Strip Tree
 pub fn strip(input: Vec<Option<i32>>)->Vec<Option<i32>>{
     // closure isn't expressive enough, expecially for recursion
     struct Stripper(Vec<Option<i32>>);
@@ -109,8 +114,8 @@ pub fn strip(input: Vec<Option<i32>>)->Vec<Option<i32>>{
     v.0
 }
 
-// Problem3: full binary tree
-fn is_full(s: &str)->bool{
+/// Problem 3: full binary tree
+pub fn is_full(s: &str)->bool{
     // parse
     let input=s.split(" ")
         .map(|s|{match s{"@"=>false, _=>true}});
@@ -139,7 +144,8 @@ fn is_full(s: &str)->bool{
     }
 }
 
-fn common_ancestor<T>(i: &Vec<Option<T>>, x:u32, mut y:u32)->Option<&T>{
+/// Problem 4: Common ancestor
+pub fn common_ancestor<T>(i: &Vec<Option<T>>, x:u32, mut y:u32)->Option<&T>{
     match (&i[(x-1) as usize], &i[(y-1) as usize]){
         (Some(_), Some(_))=>{
             y>>=x.leading_zeros()-y.leading_zeros();

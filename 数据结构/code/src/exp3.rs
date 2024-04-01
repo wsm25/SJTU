@@ -67,7 +67,8 @@ mod test{
     }
 }
 
-mod lunch{
+// Problem 1: 吃不到的午餐
+pub mod lunch{
     pub fn unsatisfy(students: &[u8], lunch: &[u8])->usize{
         let mut count=[0;10];
         for i in students{
@@ -87,7 +88,8 @@ mod lunch{
     }
 }
 
-mod stack_queue{
+/// Problem 2: Distinguish stack and queue
+pub mod stack_queue{
     pub enum Operation{
         Push(i32),
         Pop(i32),
