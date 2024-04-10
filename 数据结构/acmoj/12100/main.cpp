@@ -45,10 +45,8 @@ class Heap{
                 i=in;
             } else break;
         }
-        // print();
     }
 public:
-    // buf must be heap allocated mem, will automatically dealloc
     Heap(T** buf, size_t n):buf(buf-1), n(n){
         for(size_t i=n; i>=1; i--) down(i);
     }
@@ -65,7 +63,7 @@ public:
     size_t len(){return n;}
 };
 
-// get only prealloc pool
+// get-only prealloc pool
 template<typename T>
 class Pool{
     size_t n;
@@ -91,5 +89,6 @@ int main(){
         hufheap.push(hufpool.from({n1->weight+n2->weight, n1, n2}));
     }
     printf("%lu", hufheap.pop()->wpl());
-    
+    delete []data;
+    return 0;
 }

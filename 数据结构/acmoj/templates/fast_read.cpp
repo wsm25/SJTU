@@ -1,21 +1,21 @@
 #include <cstdio>
 
 inline int readint() {
-    int x = 0, sign = 1;
-    char ch = getchar();
-    while (ch < '0' || ch > '9') {
-        if (ch == '-') sign = -1;
-        ch = getchar();
+    int x=0, sign=1;
+    char ch=getchar();
+    while(ch<'0'||ch>'9') {
+        if(ch=='-') sign=-1;
+        ch=getchar();
     }
-    while (ch >= '0' && ch <= '9') x = x * 10 + ch - '0', ch = getchar();
+    while(ch>='0'&&ch<='9') x=x*10+ch-'0', ch=getchar();
     return sign*x;
 }
 
 inline unsigned readuint() {
-    int x = 0;
-    char ch = getchar();
-    while (ch < '0' || ch > '9') ch = getchar();
-    while (ch >= '0' && ch <= '9') x = x * 10 + ch - '0', ch = getchar();
+    int x=0;
+    char ch=getchar();
+    while(ch<'0'||ch>'9') ch=getchar();
+    while(ch>='0'&&ch<='9') x=x*10+ch-'0', ch=getchar();
     return x;
 }
 
