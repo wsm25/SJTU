@@ -65,7 +65,7 @@ public:
     size_t len(){return n;}
 };
 
-// get only pool
+// get only prealloc pool
 template<typename T>
 class Pool{
     size_t n;

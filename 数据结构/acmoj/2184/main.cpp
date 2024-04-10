@@ -51,7 +51,7 @@ class SegTree{
     }
 public:
     SegTree(int n):n(n){
-        heap=new Node[8*n];
+        heap=new Node[4*n];
         memset(heap, -1, 4*n*sizeof(Node)); // set to uint::MAX
     }
     ~SegTree(){
