@@ -27,13 +27,25 @@ fn bench_heap(c: &mut Criterion) {
         start.elapsed()
     }));
 
-    c.bench_function("pairing heap", |b| b.iter_custom(|batch|{
+    c.bench_function("pairing heap good", |b| b.iter_custom(|batch|{
         let mut heap=Pairing::new();
         let start = Instant::now();
         for _ in 0..batch{
             match random::<bool>(){ // 2ns
                 true=>{heap=heap.push(random::<i32>());},
                 false=>{heap.pop();}
+            }
+        }
+        start.elapsed()
+    }));
+
+    c.bench_function("pairing heap bad", |b| b.iter_custom(|batch|{
+        let mut heap=Pairing::new();
+        let start = Instant::now();
+        for _ in 0..batch{
+            match random::<bool>(){ // 2ns
+                true=>{heap=heap.push(random::<i32>());},
+                false=>{heap.pop_bad();}
             }
         }
         start.elapsed()

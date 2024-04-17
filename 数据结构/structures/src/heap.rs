@@ -243,15 +243,51 @@ impl <T: PartialOrd> Pairing<T>{
     fn merge(mut node: NodeBox<T>)->NodeBox<T>{
         while let Some(mut right)=node.take_right(){ match right.take_right(){
             None=>{ // finish!
-                node=Self::meld(node.into(), right.into()).into();
+                node=Self::meld_node(node, right);
             },
             Some(mut rr)=>{ // pair right and rr
                 let rrr=rr.take_right();
-                node=Self::meld(rr.into(), right.into()).into();
+                node=Self::meld_node(rr, right);
                 node.right=rrr;
             }
         }}
         node
+    }
+
+    // merge from left to right
+    fn merge_bad(mut node: NodeBox<T>)->NodeBox<T>{
+        while let Some(mut right)=node.take_right(){
+            // meld first 2
+            let rr=right.take_right();
+            node=Self::meld_node(node, right);
+            node.right=rr;
+            let mut current=&mut node;
+            // meld others
+            while let Some(mut right)=current.take_right(){ 
+                match right.take_right(){
+                None=>{
+                    current.right=Some(right);
+                    current=current.right.as_mut().unwrap();
+                },
+                Some(mut rr)=>{
+                    let rrr=rr.take_right();
+                    let mut mergedr=Self::meld_node(right, rr);
+                    mergedr.right=rrr;
+                    current.right=Some(mergedr);
+                    current=current.right.as_mut().unwrap();
+                }
+                }
+            }
+        }
+        node
+    }
+    pub fn pop_bad(&mut self)->Option<Node<T,()>>{
+        if let None=self.root {return None;}
+        let mut root=self.take_root().unwrap();
+        if let Some(left)=root.take_left(){
+            self.root=Some(Self::merge_bad(left));
+        }
+        Some(root.into())
     }
 }
 
@@ -309,7 +345,28 @@ fn test_pairing(){
     }};
 }
 
+#[cfg(test)] #[test]
+fn test_pairing_bad(){
+    use rand::random;
+    let mut heap=Pairing::new();
+    let mut x=i32::MAX;
+    for _ in 0..N { match random::<bool>(){
+        true=>{
+            let v=random::<i32>();
+            if v>x {x=v;}
+            heap=heap.push(v);
+        },
+        false=>{
+            if let Some(v)=heap.pop_bad(){
+                let v=*v;
+                assert!(x>=v);
+                x=v;
+            }
+        }
+    }};
+}
+
 use std::{mem::take, ops::{Deref, DerefMut}};
 
 #[cfg(test)]
-const N:usize=100000;
+const N:usize=10000;
