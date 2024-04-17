@@ -15,6 +15,18 @@ fn bench_heap(c: &mut Criterion) {
         start.elapsed()
     }));
     
+    c.bench_function("pairing heap legacy", |b| b.iter_custom(|batch|{
+        let mut heap=Pairing::new();
+        let start = Instant::now();
+        for _ in 0..batch{
+            match random::<bool>(){ // 2ns
+                true=>{heap=heap.push(random::<i32>());},
+                false=>{heap.pop_legacy();}
+            }
+        }
+        start.elapsed()
+    }));
+
     c.bench_function("pairing heap", |b| b.iter_custom(|batch|{
         let mut heap=Pairing::new();
         let start = Instant::now();
@@ -26,6 +38,7 @@ fn bench_heap(c: &mut Criterion) {
         }
         start.elapsed()
     }));
+    
     c.bench_function("binary heap sequent", |b| b.iter_custom(|batch|{
         let mut heap=Binary::new();
         let start = Instant::now();
@@ -48,6 +61,7 @@ fn bench_heap(c: &mut Criterion) {
         }
         start.elapsed()
     }));
+    
 }
 
 criterion_group!(benches, bench_heap);

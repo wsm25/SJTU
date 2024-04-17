@@ -122,6 +122,9 @@ impl<T,E> NodeBox<T,E>{
     fn take_right(&mut self)->Option<Self>{
         take(&mut self.right)
     }
+    fn take_left(&mut self)->Option<Self>{
+        take(&mut self.left)
+    }
 }
 
 impl<T, E> Deref for NodeBox<T, E>{
@@ -147,7 +150,7 @@ impl<T, E> From<Node<T,E>> for NodeBox<T,E>{
 }
 
 /// boxed wrapper of Node, used inside module
-pub struct Node<T, E>(Box<RawNode<T,E>>);
+pub struct Node<T, E=()>(Box<RawNode<T,E>>);
 
 impl<T, E> Deref for Node<T, E>{
     type Target = T;
@@ -165,7 +168,8 @@ impl<T, E> DerefMut for Node<T, E>{
 /// Pairing Heap
 /// 
 /// Known issue:
-/// - Stack Overflow caused by recursive implement
+/// - [x] Stack Overflow caused by recursive implement
+/// - [ ] expensive malloc and free call each push and pop
 pub struct Pairing<T: PartialOrd>{
     root: Option<NodeBox<T>>
 }
@@ -179,43 +183,109 @@ impl <T: PartialOrd> Pairing<T>{
     fn take_root(&mut self)->Option<NodeBox<T>>{
         take(&mut self.root)
     }
+    /// treat nodebox as pairing heap root
+    fn meld_node(mut x: NodeBox<T>, mut y: NodeBox<T>)->NodeBox<T>{
+        if x.value<y.value {(x,y)=(y,x);} // x greater, as root
+        y.right=take(&mut x.left); // x son as y peer
+        x.left=Some(y);
+        x
+    }
+    /// meld two pairing tree
     pub fn meld(self, y: Self)->Self{
         if let None=self.root {return y;}
         if let None=y.root {return self;}
-        // will optimize at -O1: dead branch strip
-        let mut x=self.root.unwrap();
-        let mut y=y.root.unwrap();
-        if x.value<y.value {(x,y)=(y,x);} // x greater
-        // will optimize at -O2: unread value optimization
-        y.right=take(&mut x.left); // SAFETY: y.right==None
-        x.left=Some(y);
-        Self{root: Some(x)}
+        // SAFETY: both x and y are not none
+        Self::meld_node(self.into(), y.into()).into()
     }
     pub fn push(self, value: T)->Self{
         let y=NodeBox(Box::new(RawNode{
             value, left:None, right:None, extra:()
         }));
-        self.meld(Self{root: Some(y)})
+        self.meld(y.into())
     }
-    pub fn pop(&mut self)->Option<Node<T,()>>{
+    /// legacy recursive implement of pop, may stack overflow if
+    /// too many nodes are pushed without pop
+    pub fn pop_legacy(&mut self)->Option<Node<T,()>>{
         if let None=self.root {return None;}
         let mut root=self.take_root().unwrap();
-        self.root=Self{root: take(&mut root.left)}.merge().root;
+        self.root=match root.take_left(){
+            None=>None,
+            Some(left)=>Some(Self::merge_legacy(left))
+        };
         Some(root.into())
     }
 
-    fn merge(mut self)->Self{
-        if let None=self.root {return self;}
-        match &mut self.root{
-        None=>self,
-        Some(root)=>match &mut root.right{
-            None=>self,
-            Some(sib)=>Self::meld(
-                Self{root:sib.take_right()}.merge(),
-                Self{root:root.take_right()}.meld(self)
+    /// merge all siblings into one tree
+    fn merge_legacy(mut node: NodeBox<T>)->NodeBox<T>{
+        match node.take_right(){
+        None=>node, // already a valid root node
+        Some(mut sib)=>{
+            match sib.take_right(){
+            None=>Self::meld_node(node, sib),
+            Some(sibr)=>Self::meld_node(
+                Self::merge_legacy(sibr),
+                Self::meld_node(node, sib)
             )
+            }
         }}
     }
+
+    pub fn pop(&mut self)->Option<Node<T,()>>{
+        if let None=self.root {return None;}
+        let mut root=self.take_root().unwrap();
+        if let Some(left)=root.take_left(){
+            self.root=Some(Self::merge(left));
+        }
+        Some(root.into())
+    }
+
+    // merge from left to right
+    fn merge(mut node: NodeBox<T>)->NodeBox<T>{
+        while let Some(mut right)=node.take_right(){ match right.take_right(){
+            None=>{ // finish!
+                node=Self::meld(node.into(), right.into()).into();
+            },
+            Some(mut rr)=>{ // pair right and rr
+                let rrr=rr.take_right();
+                node=Self::meld(rr.into(), right.into()).into();
+                node.right=rrr;
+            }
+        }}
+        node
+    }
+}
+
+impl <T: PartialOrd> From<NodeBox<T>> for Pairing<T>{
+    fn from(value: NodeBox<T>) -> Self {
+        unsafe{std::mem::transmute(value)}
+    }
+}
+
+impl <T: PartialOrd> Into<NodeBox<T>> for Pairing<T>{
+    fn into(self) -> NodeBox<T> {
+        unsafe{std::mem::transmute(self)}
+    }
+}
+
+#[cfg(test)] #[test]
+fn test_pairing_legacy(){
+    use rand::random;
+    let mut heap=Pairing::new();
+    let mut x=i32::MAX;
+    for _ in 0..N { match random::<bool>(){
+        true=>{
+            let v=random::<i32>();
+            if v>x {x=v;}
+            heap=heap.push(v);
+        },
+        false=>{
+            if let Some(v)=heap.pop_legacy(){
+                let v=*v;
+                assert!(x>=v);
+                x=v;
+            }
+        }
+    }};
 }
 
 #[cfg(test)] #[test]
@@ -242,4 +312,4 @@ fn test_pairing(){
 use std::{mem::take, ops::{Deref, DerefMut}};
 
 #[cfg(test)]
-const N:usize=1000;
+const N:usize=100000;
