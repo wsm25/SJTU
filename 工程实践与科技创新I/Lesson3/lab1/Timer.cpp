@@ -2,6 +2,9 @@
  
 void (*timerFunc)(void);
 
+/// @brief 定时器设置函数
+/// @param timerFunction 定期器中断服务程序函数名
+/// @param timerPeriod_ms 定期周期，单位为ms,取值范围1-20
 void SetTimer(void (*timerFunction)(void), uint32_t timerPeriod_ms)
 {
     if(timerPeriod_ms <= 0)       
@@ -11,20 +14,7 @@ void SetTimer(void (*timerFunction)(void), uint32_t timerPeriod_ms)
    
     timerFunc = timerFunction;             // Set ISR 
     TA1CTL = TASSEL_2 + MC_1+ ID_3;        // SMCLK = 25MHz, source = SMCLK/8, Upmode   
-    TA1CCR0 = timerPeriod_ms * 3125L;      // = ms * 1e5 / 2e5
-    TA1CCTL0 = CCIE;                       // TA1CCR0 interrupt enabled
-    _BIS_SR(GIE);                          // Enter LPM0 interrupt
-}
-
-void SetTimer_us(void (*timerFunction)(void), uint16_t timerPeriod_us)
-{
-    if(timerPeriod_us <= 0) return;        // invalid period, never run
-    if(timerPeriod_us >= 20972)
-       timerPeriod_us = 20971;
-   
-    timerFunc = timerFunction;             // Set ISR 
-    TA1CTL = TASSEL_2 + MC_1+ ID_3;        // SMCLK = 25MHz, source = SMCLK/8, Upmode   
-    TA1CCR0 = (timerPeriod_us * 25)/8;     // = us * 1e2 / 2e5
+    TA1CCR0 = timerPeriod_ms * 3125L;          
     TA1CCTL0 = CCIE;                       // TA1CCR0 interrupt enabled
     _BIS_SR(GIE);                          // Enter LPM0 interrupt
 }
