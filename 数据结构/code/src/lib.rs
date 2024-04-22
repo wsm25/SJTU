@@ -6,3 +6,5 @@ pub mod exp2;
 pub mod exp3;
 pub mod exp3_teque;
 pub mod exp4;
+/// too trivial
+pub mod exp5{}
