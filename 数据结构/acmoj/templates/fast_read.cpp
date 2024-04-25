@@ -20,6 +20,7 @@ inline unsigned readuint() {
 }
 
 inline void putuint(unsigned x) {
+    if(x==0) {putchar('0'); return;}
     char buf[12];
     int i=11;
     while(x!=0){
@@ -30,6 +31,7 @@ inline void putuint(unsigned x) {
 }
 
 inline void putint(int x) {
+    if(x==0) {putchar('0'); return;}
     if(x<0) x=-x;
     char buf[12];
     int i=11;
