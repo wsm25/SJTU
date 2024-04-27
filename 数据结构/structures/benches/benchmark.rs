@@ -14,66 +14,42 @@ fn bench_heap(c: &mut Criterion) {
         }}
         start.elapsed()
     }));
-    
-    c.bench_function("pairing heap legacy", |b| b.iter_custom(|batch|{
-        let mut heap=Pairing::new();
-        let start = Instant::now();
-        for _ in 0..batch{
-            match random::<bool>(){ // 2ns
-                true=>{heap=heap.push(random::<i32>());},
-                false=>{heap.pop_legacy();}
-            }
-        }
-        start.elapsed()
-    }));
 
-    c.bench_function("pairing heap good", |b| b.iter_custom(|batch|{
-        let mut heap=Pairing::new();
+    c.bench_function("leftist heap", |b| b.iter_custom(|batch|{
+        let mut heap=Leftist::new();
         let start = Instant::now();
-        for _ in 0..batch{
-            match random::<bool>(){ // 2ns
-                true=>{heap=heap.push(random::<i32>());},
-                false=>{heap.pop();}
-            }
-        }
-        start.elapsed()
-    }));
-
-    c.bench_function("pairing heap bad", |b| b.iter_custom(|batch|{
-        let mut heap=Pairing::new();
-        let start = Instant::now();
-        for _ in 0..batch{
-            match random::<bool>(){ // 2ns
-                true=>{heap=heap.push(random::<i32>());},
-                false=>{heap.pop_bad();}
-            }
-        }
+        for _ in 0..batch{match random::<bool>(){ // 2ns
+            true=>{heap.push(random::<i32>());},
+            false=>{heap.pop();}
+        }}
         start.elapsed()
     }));
     
     c.bench_function("binary heap sequent", |b| b.iter_custom(|batch|{
         let mut heap=Binary::new();
-        let start = Instant::now();
+        
         for _ in 0..batch{
             heap.push(random::<i32>());
         }
-        for _ in 0..batch{
-            heap.pop();
-        }
-        start.elapsed()
-    }));
-    c.bench_function("pairing heap sequent", |b| b.iter_custom(|batch|{
-        let mut heap=Pairing::new();
         let start = Instant::now();
-        for _ in 0..batch{
-            heap=heap.push(random::<i32>());
-        }
         for _ in 0..batch{
             heap.pop();
         }
         start.elapsed()
     }));
     
+    c.bench_function("leftist heap sequent", |b| b.iter_custom(|batch|{
+        let mut heap=Leftist::new();
+        
+        for _ in 0..batch{
+            heap.push(random::<i32>());
+        }
+        let start = Instant::now();
+        for _ in 0..batch{
+            heap.pop();
+        }
+        start.elapsed()
+    }));
 }
 
 criterion_group!(benches, bench_heap);
