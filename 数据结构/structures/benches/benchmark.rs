@@ -16,7 +16,7 @@ fn bench_heap(c: &mut Criterion) {
     }));
 
     c.bench_function("leftist heap", |b| b.iter_custom(|batch|{
-        let mut heap=LeftistForest::new().new_tree();
+        let mut heap=Leftist::new();
         let start = Instant::now();
         for _ in 0..batch{match random::<bool>(){ // 2ns
             true=>{heap.push(random::<i32>());},
@@ -38,7 +38,7 @@ fn bench_heap(c: &mut Criterion) {
     }));
     
     c.bench_function("leftist heap sequent", |b| b.iter_custom(|batch|{
-        let mut heap=LeftistForest::new().new_tree();
+        let mut heap=Leftist::new();
         let start = Instant::now();
         for _ in 0..batch{
             heap.push(random::<i32>());

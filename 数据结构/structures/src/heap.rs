@@ -3,11 +3,6 @@
 //! 
 //! We implement higher priority root heap
 
-use std::{mem::{ManuallyDrop, MaybeUninit}, ops::DerefMut};
-use core::num::NonZeroUsize;
-
-use crate::utils::Share;
-
 /// f(x) returns i that i=2^x wile i <= x< 2*i
 pub fn half2(x: usize)->usize{
     1<<(63-x.leading_zeros())
@@ -111,62 +106,29 @@ fn test_binary(){
 }
 
 struct LeftistNode<T: PartialOrd>{
-    left: usize, // 0 if null
-    right: usize,
+    left: LeftPtr<T>, // 0 if null
+    right: LeftPtr<T>,
     dist: isize, // -1 if null
-    value: ManuallyDrop<T>,
+    value: T,
+}
+type LeftPtr<T>=Option<Box<LeftistNode<T>>>;
+
+impl<T: PartialOrd> LeftistNode<T>{
+    fn swap(&mut self){
+        std::mem::swap(&mut self.left, &mut self.right);}
+    fn take_right(&mut self)->LeftPtr<T>{
+        std::mem::take(&mut self.right)}
+    fn take_left(&mut self)->LeftPtr<T>{
+        std::mem::take(&mut self.left)}
 }
 
-struct LeftistPool<T: PartialOrd>{
-    buf: Vec<LeftistNode<T>>,
-    pool: Vec<NonZeroUsize> // will reuse node
-}
-
-impl<T: PartialOrd> LeftistPool<T>{
-    pub fn merge(&mut self, mut x: usize, mut y: usize)->usize{
-        if x==0 || y==0 {return x|y;}
-        let b=&mut self.buf; // buffer alias
-        // x as greater
-        if b[x].value < b[y].value {(x,y)=(y,x);}
-        // merge x.right and y
-        let newx=b[x].right;
-        self.buf[x].right=self.merge(b[x].right, y);
-        let b=&mut self.buf; // buffer alias
-        // leftist
-        if b[b[x].right].dist > b[b[x].left].dist{
-            (b[x].right, b[x].left)=(b[x].left, b[x].right);
-        }
-        // maintain dist
-        b[x].dist=b[b[x].right].dist+1;
-        x
-    }
-    /// for alias usage
-    fn fields(&mut self)->(&mut Vec<LeftistNode<T>>, &mut Vec<NonZeroUsize>){
-        (&mut self.buf, &mut self.pool)
-    }
-}
-impl<T: PartialOrd> Drop for LeftistPool<T>{
-    fn drop(&mut self) {
-        let b=&mut self.buf;
-        for i in b{
-            if i.dist!=-1{
-                unsafe{std::ptr::drop_in_place(
-                    (i.value.deref_mut()) as *mut T
-                )}
-            }
-        }
-    }
-}
-
-/// Leftist forest, can generate new leftist tree, mergeable
-/// with other trees in the forest.
+/// Leftist tree, mergeable with other leftist tree.
 /// 
 /// # Example
 /// ```
-/// use structures::heap::LeftistForest;
-/// let mut forest=LeftistForest::new();
-/// let mut heap1=forest.new_tree();
-/// let mut heap2=forest.new_tree();
+/// use structures::heap::Leftist;
+/// let mut heap1=Leftist::new();
+/// let mut heap2=Leftist::new();
 /// for i in [1,1,4,5,1,4]{
 ///     heap1.push(i)
 /// }
@@ -178,80 +140,64 @@ impl<T: PartialOrd> Drop for LeftistPool<T>{
 ///     assert_eq!(i, heap1.pop().unwrap());
 /// }
 /// ```
-pub struct LeftistForest<T: PartialOrd>(Share<LeftistPool<T>>);
-impl<T: PartialOrd> LeftistForest<T>{
-    pub fn new()->Self{
-        Self(Share::new(LeftistPool{
-        // SAFETY: value won't drop
-        buf: vec![LeftistNode{
-            left:0, right:0, dist:-1,
-            value: unsafe{MaybeUninit::uninit().assume_init()}
-        }],
-        pool: Vec::new()
-        }))
-    }
-    pub fn new_tree(&self)->LeftistTree<T>{
-        LeftistTree{ root: 0, forest: self.0.clone() }
-    }
+pub struct Leftist<T: PartialOrd>{
+    root: LeftPtr<T>
 }
 
-pub struct LeftistTree<T: PartialOrd>{
-    root: usize,
-    forest: Share<LeftistPool<T>>,
-}
-
-impl <T: PartialOrd> LeftistTree<T>{
-    pub fn new(rc: &LeftistForest<T>)->Self{
-        rc.new_tree()
-    }
-    pub fn push(&mut self, value: T){
-        let new_node=LeftistNode{
-            left:0, right:0, dist:0, 
-            value: ManuallyDrop::new(value)
-        };
-        let (buf, pool)=self.forest.fields();
-        let x=match pool.pop(){
-        Some(i)=>{
-            let i=i.get();
-            buf[i]=new_node;
-            i
-        },
-        None=>{
-            buf.push(new_node);
-            buf.len()-1
-        }};
-        self.root=self.forest.merge(self.root, x);
-    }
-
-    pub fn pop(&mut self)->Option<T>{
-        if self.root==0 {return None;}
-        let (buf, pool)=self.forest.fields();
-        let root=&mut buf[self.root];
-        let output=unsafe{ManuallyDrop::take(&mut root.value)};
-        root.dist=-1;
-        // safety: root!=0
-        pool.push(unsafe{NonZeroUsize::new_unchecked(self.root)});
-        // FUCKING rust ownership
-        let (left, right)=(buf[self.root].left, buf[self.root].right);
-        self.root=self.forest.merge(left, right);
-        Some(output)
-    }
-
-    pub fn merge(&mut self, other: Self){
-        if self.forest!=other.forest {
-            panic!("merge leftist tree from different forest!");
+impl<T: PartialOrd> Leftist<T>{
+    fn merge_ptr(x: LeftPtr<T>, y: LeftPtr<T>)->LeftPtr<T>{
+        if let None=x {return y;}
+        if let None=y {return x;}
+        // safety: nonnull
+        let mut x=unsafe{x.unwrap_unchecked()};
+        let mut y=unsafe{y.unwrap_unchecked()};
+        // x as greater
+        if x.value < y.value {(x,y)=(y,x);}
+        // merge x.right and y
+        x.right=Self::merge_ptr(x.take_right(), Some(y));
+        // leftist
+        fn dist<T: PartialOrd>(x: &LeftPtr<T>)->isize{match x{
+            None=>-1,
+            Some(x)=>x.dist
+        }}
+        if dist(&x.right) > dist(&x.left){
+            x.swap();
         }
-        self.root=self.forest.merge(self.root, other.root)
+        // maintain dist
+        x.dist=dist(&x.right)+1;
+        Some(x)
     }
+    fn take_root(&mut self)->LeftPtr<T>{
+        std::mem::take(&mut self.root)
+    }
+    pub fn new()->Self{
+        Self{root:None}
+    }
+    pub fn push(&mut self, value:T){
+        let newnode=Box::new(LeftistNode{
+            left:None, right:None, dist:0,
+            value
+        });
+        self.root=Self::merge_ptr(
+            self.take_root(), Some(newnode));
+    }
+    pub fn pop(&mut self)->Option<T>{
+        if let None=self.root{return None;}
+        let mut root=unsafe{self.take_root().unwrap_unchecked()};
+        self.root=Self::merge_ptr(root.take_left(), root.take_right());
+        Some(root.value)
+    }
+    pub fn merge(&mut self, other: Self){
+        self.root=Self::merge_ptr(
+            self.take_root(), other.root);
+    }
+
 }
-
-
 
 #[cfg(test)] #[test]
 fn test_leftist(){
     use rand::random;
-    let forest=LeftistForest::new();
-    let mut heap=LeftistTree::new(&forest);
+    let mut heap=Leftist::new();
     let mut x=i32::MAX;
     for _ in 0..N { match random::<bool>(){
         true=>{
