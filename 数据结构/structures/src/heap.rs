@@ -191,7 +191,6 @@ impl<T: PartialOrd> Leftist<T>{
         self.root=Self::merge_ptr(
             self.take_root(), other.root);
     }
-
 }
 
 #[cfg(test)] #[test]
