@@ -32,7 +32,7 @@ inline void putuint(unsigned x) {
 
 inline void putint(int x) {
     if(x==0) {putchar('0'); return;}
-    if(x<0) x=-x;
+    if(x<0) {x=-x; putchar('-');}
     char buf[12];
     int i=11;
     while(x!=0){
