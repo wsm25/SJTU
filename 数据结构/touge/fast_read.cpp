@@ -39,3 +39,17 @@ inline void putint(int x) {
     }
     while((++i)<12) putchar('0'+buf[i]);
 }
+
+struct IntReader{
+    char ch; // prevent to be dropped
+    IntReader(){ch=getchar();} 
+    int operator()(){
+        int x=0, sign=1;
+        while(ch<'0'||ch>'9') {
+            if(ch=='-') sign=-1;
+            ch=getchar();
+        }
+        while(ch>='0'&&ch<='9') x=x*10+ch-'0', ch=getchar();
+        return sign*x;
+    }
+};
