@@ -42,10 +42,10 @@ pub mod nodelist {
         next: Link
     }
     
-    /// TODO iterator and drop implement with
-    /// ```rust, no_run
-    /// type Link = Cell<Option<Box<Node>>>;
-    /// ```
+    // TODO iterator and drop implement with
+    // ```rust
+    // type Link = Cell<Option<Box<Node>>>;
+    // ```
     pub struct NodeList{
         head: Box<Node>
     }
