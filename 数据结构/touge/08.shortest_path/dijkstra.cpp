@@ -19,6 +19,15 @@ struct GraphNode{
     GraphVec child;
     GraphVec minroute;
 };
+// lhs > rhs
+bool comp_vec(const GraphVec& lhs, const GraphVec& rhs){
+    size_t n=lhs.size()<rhs.size() ? lhs.size() : rhs.size();
+    for(size_t i=1; i<n; i++){
+        if(lhs[i]>rhs[i]) return true;
+        else if(lhs[i]<rhs[i]) return false;
+    }
+    return lhs.size()>rhs.size();
+}
 
 // GraphNode* for dijkstra priority_queue
 // Node minroute must non-empty
@@ -30,7 +39,7 @@ struct DNode{
     }
     bool operator>(const DNode& rhs) const{
         return weight>rhs.weight ||
-               weight==rhs.weight && p>rhs.p;
+            weight==rhs.weight && comp_vec(p->minroute, rhs.p->minroute);
     }
 };
 
@@ -70,11 +79,6 @@ int main(){
         readuint(m);
         oldline=readuint(n);
         buf[m].child.push_back(buf+n);
-    }
-    // ensure less node is at front
-    for(int i=1; i<=N; i++){
-        auto& child=buf[i].child;
-        std::sort(child.begin(), child.end());
     }
     unsigned from, to;
     readuint(from); readuint(to);
