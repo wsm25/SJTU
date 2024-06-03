@@ -3,15 +3,41 @@
 
 #include <Energia.h>    //使用Energia的头文件
 
-class HX711
-{
+class HX711 {
+    int SCK, DT; // output and input pin
+    // read one bit from DT pin with 
+    inline int readDT() {
+        digitalWrite(SCK, HIGH);  // SCK=1 
+        // pause for 5 cycles, 0.2 us
+        asm("nop\n\tnop\n\tnop\n\tnop\n\tnop");
+        // delayMicroseconds(1);
+        int read=digitalRead(DT); // read
+        digitalWrite(SCK, LOW);  // SCK=0
+        asm("nop\n\tnop\n\tnop\n\tnop\n\tnop");
+        // delayMicroseconds(1);
+        return read;
+    }
 public:
-  HX711(int SCK_PIN,int DT_PIN);  
-  void begin();       // 初始化HX711  
-  long HX711_Read();  // 传感器数据读取函数
-private:	
-  int HX711_SCK;      // HX711_SCK为输出口 —— 输出脉冲
-  int HX711_DT;       // HX711_DT为输入口  —— 读取数据
+    HX711(int SCK,int DT):SCK(SCK), DT(DT){
+        pinMode(SCK, OUTPUT);	
+        pinMode(DT, INPUT);
+        digitalWrite(SCK, LOW);
+    }
+    // waiting MUST be false!
+    long read() {
+        noInterrupts(); // prevent serial error
+        long count=0;
+        for(int i = 0; i < 24; i++) // 24 valid bits
+            count=(count<<1)+readDT();
+        readDT(); // Channel A, Gain 128
+        interrupts();
+        // 2's complement with msb of 23
+        if(count & 0x800000) count |= 0xFF000000; // complete bit 24-31
+        return count;
+    }
+    // wait for AD conversion
+    bool waiting(){
+        return digitalRead(DT);
+    }
 };
-
 #endif
