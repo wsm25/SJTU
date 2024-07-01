@@ -27,7 +27,7 @@ int main(int argc, char* argv[]){
     std::fstream f;
     f.open(argv[2], std::ios::binary | std::ios::out );
     if(!f.is_open()){
-        std::cout<<"错误：文件无法打开\n"<<std::endl;
+        std::cout<<"错误：文件无法打开"<<std::endl;
         return -1;
     }
     std::srand(std::time(0));
