@@ -1,45 +1,13 @@
 #include <cstdio>
-#include <cstring>
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <cctype>
 #include <algorithm>
 
-struct Row{
-    std::string name;
-    std::string id;
-    int score;
-public:
-    Row(const std::string& line){
-        const char* s=line.c_str(), *p=s;
-        // name
-        while(isprint(*p) && *p!=' ') p++;
-        if(*p!=' ') throw "Invalid input";
-        name = std::string(s, p);
-        while(*p==' ') p++;
-        if(*p==0) throw "Unexpected EOL";
-        // id
-        s=p;
-        while(isdigit(*p) && *p!=' ') p++;
-        if(*p!=' ') throw "Invalid input";
-        id = std::string(s, p);
-        while(*p==' ') p++;
-        if(*p==0) throw "Unexpected EOL";
-        // score
-        s=p;
-        while(isdigit(*p) && *p!=' ') p++;
-        if(*p!=0 && *p!=' ') throw "Invalid input";
-        score=atoi(s);
-    }
-    friend std::ostream& operator<<(std::ostream& os, Row& x){
-        return os<<x.name<<'\t'<<x.id<<'\t'<<x.score;
-    }
-};
+#include "row.h"
 
 int main(int argc, char* argv[]){
-    if(argc!=2 || strcmp(argv[1], "-h")==0){
+    if(argc!=2 || std::string("-h")==argv[1]){
         printf(
             "Usage: %s [file] | [-h]\n"
             "Arguments:\n"
@@ -51,7 +19,7 @@ int main(int argc, char* argv[]){
     }
     std::ifstream file(argv[1]);
     if(file.fail()){
-        printf("Error: file `%s` does not exist!", argv[1]);
+        printf("Error: file `%s` does not exist!\n", argv[1]);
         return -1;
     }
     std::string line;
@@ -85,7 +53,7 @@ int main(int argc, char* argv[]){
         printf("ScoreManager> ");
         if(!std::getline(std::cin, line)) {
             puts("EOF");
-            return 0;
+            return -1;
         }
         if(line=="quit") {
             puts("Quit");
