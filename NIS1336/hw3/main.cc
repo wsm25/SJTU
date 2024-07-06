@@ -3,8 +3,22 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cctype>
 
 #include "row.h"
+
+// case insensitive compare
+int icmp(const std::string& lhs, const std::string& rhs){
+    size_t len = lhs.size()<rhs.size()?lhs.size():rhs.size();
+    for(size_t i=0; i<len; i++){
+        char l=tolower(lhs[i]), r=tolower(rhs[i]);
+        if(l<r) return -1;
+        if(l>r) return 1;
+    }
+    if(lhs.size()<rhs.size()) return -1;
+    if(lhs.size()>rhs.size()) return 1;
+    return 0;
+}
 
 int main(int argc, char* argv[]){
     if(argc!=2 || std::string("-h")==argv[1]){
@@ -55,21 +69,21 @@ int main(int argc, char* argv[]){
             puts("EOF");
             return -1;
         }
-        if(line=="quit") {
+        if(icmp(line,"quit")==0) {
             puts("Quit");
             return 0;
         }
-        else if(line=="showAll"){
+        else if(icmp(line,"showAll")==0){
             std::cout<<"Name"<<'\t'<<"Student ID"<<'\t'<<"Score"<<'\n';
             for(auto &x:table)
                 std::cout<<x<<'\n';
         }
-        else if(line=="showMax"){
+        else if(icmp(line,"showMax")==0){
             std::cout<<"Highest score owner: \n";
             std::cout<<"Name"<<'\t'<<"Student ID"<<'\t'<<"Score"<<'\n';
             std::cout<<highest<<'\n';
         }
-        else if(line=="showAve"){
+        else if(icmp(line,"showAve")==0){
             std::cout<<"Average score: "<<avg<<"\n";
         }
         else {
