@@ -10,4 +10,4 @@
 - [Chapter 3. 图](./Chapter3.ipynb)
 - [Chapter 4. 符号计算](./Chapter4.ipynb)
 - [Chapter 5. 特征提取](./Chapter5.ipynb)
-- [Chapter 6. Misc](./Chapter6.ipynb)
+- [Chapter 6. 妙妙工具](./Chapter6.ipynb)
