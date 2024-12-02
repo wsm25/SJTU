@@ -32,7 +32,7 @@ qemu-arm-static -L /usr/arm-linux-gnueabi main
 11
 ```
 
-解释： $\left(\begin{matrix}1&2\end{matrix}\right)\left(\begin{matrix}3\\4\end{matrix}\right)=(11)$
+解释： $(1,2)(3,4)^T=(11)$
 
 ## 测试
 
